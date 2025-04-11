@@ -1,4 +1,4 @@
-24210522731726384
+24198363159655669
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -97964,55 +97964,6 @@ Varistor VF
 0
 2
 2
-footprints
-itsybitsy
-Through hole straight socket strip, 1x14, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
-Through hole socket strip THT 1x14 2.54mm single row
-0
-28
-28
-footprints
-nice_nano
-
-
-0
-27
-27
-footprints
-nice_nano_clean
-
-
-0
-24
-24
-footprints
-nice_nano_cleanest
-
-
-0
-26
-26
-footprints
-ssd1306
-Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
-Through hole socket strip THT 1x04 2.54mm single row
-0
-4
-4
-footprints
-ssd1306_a
-Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
-Through hole socket strip THT 1x04 2.54mm single row
-0
-4
-4
-footprints
-ssd1306_b
-Through hole straight socket strip, 1x04, 2.54mm pitch, single row (from Kicad 4.0.7), script generated
-Through hole socket strip THT 1x04 2.54mm single row
-0
-4
-4
 wio-sx1262
 wio-sx1262
 
