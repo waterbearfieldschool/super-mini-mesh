@@ -1866,7 +1866,7 @@
 			(uuid "961fb8bc-97e2-4db9-b58a-fd6e3be331d4")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 3.81 360)
+			(at 0 3.81 0)
 			(layer "F.Fab")
 			(uuid "b238938e-55f6-48b6-bf4d-f2da1fb80236")
 			(effects
@@ -2416,7 +2416,7 @@
 	(footprint "Connector_PinSocket_2.54mm:PinSocket_1x01_P2.54mm_Vertical"
 		(layer "F.Cu")
 		(uuid "e5f89951-dc9e-4d99-bf0c-ca303e685967")
-		(at 107.6 41.6)
+		(at 107.8 42.3)
 		(descr "Through hole straight socket strip, 1x01, 2.54mm pitch, single row (from Kicad 4.0.7), script generated")
 		(tags "Through hole socket strip THT 1x01 2.54mm single row")
 		(property "Reference" "J4"
@@ -3078,7 +3078,7 @@
 		)
 	)
 	(gr_text "waterbearfieldschool.org/thistle"
-		(at 110.9 45.1 90)
+		(at 110.8 45.7 90)
 		(layer "F.SilkS")
 		(uuid "3d3aae13-9995-4659-89c6-0cc5a435cc67")
 		(effects
@@ -3137,8 +3137,8 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "ANT"
-		(at 106.7 40.1 0)
+	(gr_text "ANTENNA"
+		(at 108.25 40.7 90)
 		(layer "F.SilkS")
 		(uuid "94cab846-c250-4ebb-b04d-005fbd408bc2")
 		(effects
@@ -3174,7 +3174,7 @@
 		)
 	)
 	(gr_text "v0.1"
-		(at 107.2 46 0)
+		(at 107.1 47 0)
 		(layer "F.SilkS")
 		(uuid "f18d56f0-c569-4702-ae15-99025f53b45e")
 		(effects
@@ -4650,12 +4650,20 @@
 		(uuid "cba74b06-1645-49ab-88ae-c7be6959bae0")
 	)
 	(segment
-		(start 105.8 41.6)
-		(end 107.6 41.6)
+		(start 107.1 41.6)
+		(end 107.8 42.3)
 		(width 0.7)
 		(layer "F.Cu")
 		(net 16)
-		(uuid "17f4e8ca-a14a-4323-8d29-525d1603d07a")
+		(uuid "66f1553a-03ce-448d-933d-597da536db98")
+	)
+	(segment
+		(start 105.8 41.6)
+		(end 107.1 41.6)
+		(width 0.7)
+		(layer "F.Cu")
+		(net 16)
+		(uuid "cece6f83-3209-46cf-a0e3-6e7cdde24bcc")
 	)
 	(segment
 		(start 93.86 39.06)
