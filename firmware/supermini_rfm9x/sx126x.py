@@ -206,7 +206,7 @@ class SX126X:
         ASSERT(state)
 
         start = ticks_us()
-        while not self.irq.value():
+        while not self.irq.value:
             yield_()
             if abs(ticks_diff(start, ticks_us())) > timeout:
                 self.clearIrqStatus()
@@ -257,7 +257,7 @@ class SX126X:
         ASSERT(state)
 
         start = ticks_us()
-        while not self.irq.value():
+        while not self.irq.value:
             yield_()
             if timeout_en:
                 if abs(ticks_diff(start, ticks_us())) > timeout:
