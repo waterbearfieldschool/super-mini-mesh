@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Signal Strength (RSSI) Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .controls {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+        
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        
+        .info-panel {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Radio Signal Strength (RSSI) Visualization</h1>
+            <p>Interactive map showing radio signal strength measurements</p>
+        </div>
+        
+        <div class="controls">
+            <div class="legend">
+                <strong>Signal Strength Legend:</strong>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #d73027;"></div>
+                    <span>Very Weak (&lt; -100 dBm)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #fc8d59;"></div>
+                    <span>Weak (-100 to -85 dBm)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #fee08b;"></div>
+                    <span>Fair (-85 to -70 dBm)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #d9ef8b;"></div>
+                    <span>Good (-70 to -55 dBm)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #91bfdb;"></div>
+                    <span>Excellent (-55 to -40 dBm)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box" style="background-color: #4575b4;"></div>
+                    <span>Outstanding (&gt; -40 dBm)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="map"></div>
+        
+        <div class="info-panel">
+            <h3>Data Summary</h3>
+            <div id="stats" class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-points">-</div>
+                    <div class="stat-label">Total Measurements</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="avg-rssi">-</div>
+                    <div class="stat-label">Average RSSI (dBm)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="min-rssi">-</div>
+                    <div class="stat-label">Minimum RSSI (dBm)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="max-rssi">-</div>
+                    <div class="stat-label">Maximum RSSI (dBm)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([0, 0], 2);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Function to get color based on RSSI value
+        function getRSSIColor(rssi) {
+            if (rssi > -40) return '#4575b4';      // Outstanding (blue)
+            else if (rssi > -55) return '#91bfdb'; // Excellent (light blue)
+            else if (rssi > -70) return '#d9ef8b'; // Good (light green)
+            else if (rssi > -85) return '#fee08b'; // Fair (yellow)
+            else if (rssi > -100) return '#fc8d59'; // Weak (orange)
+            else return '#d73027';                  // Very weak (red)
+        }
+        
+        // Function to get signal quality description
+        function getSignalQuality(rssi) {
+            if (rssi > -40) return 'Outstanding';
+            else if (rssi > -55) return 'Excellent';
+            else if (rssi > -70) return 'Good';
+            else if (rssi > -85) return 'Fair';
+            else if (rssi > -100) return 'Weak';
+            else return 'Very Weak';
+        }
+        
+        // Function to parse CSV data
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+            
+            console.log("parse debug");
+            console.log(lines);
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                console.log("values debug");
+                console.log(values);
+                row = {};
+                
+                /*
+                headers.forEach((header, index) => {
+                    const value = values[index]?.trim();
+                    if (value !== undefined && value !== '') {
+                        // Try to parse as number, otherwise keep as string
+                        const numValue = parseFloat(value);
+                        row[header] = isNaN(numValue) ? value : numValue;
+                    }
+                });
+                */
+                lat=parseFloat(values[1]);
+                lon=parseFloat(values[2]);
+                rssi=parseFloat(values[3]);
+                row={latitude:lat,longitude:lon,rssi:rssi};
+                
+                // Only add rows that have latitude, longitude, and rssi
+                if (row.latitude && row.longitude && row.rssi !== undefined) {
+                    data.push(row);
+                }
+            }
+            
+            console.log("data debug");
+            console.log(data)
+            
+            return data;
+        }
+        
+        // Function to update statistics
+        function updateStats(data) {
+            const rssiValues = data.map(d => d.rssi).filter(r => !isNaN(r));
+            
+            if (rssiValues.length === 0) return;
+            
+            const totalPoints = data.length;
+            const avgRssi = (rssiValues.reduce((a, b) => a + b, 0) / rssiValues.length).toFixed(1);
+            const minRssi = Math.min(...rssiValues);
+            const maxRssi = Math.max(...rssiValues);
+            
+            document.getElementById('total-points').textContent = totalPoints.toLocaleString();
+            document.getElementById('avg-rssi').textContent = avgRssi;
+            document.getElementById('min-rssi').textContent = minRssi;
+            document.getElementById('max-rssi').textContent = maxRssi;
+        }
+        
+        // Function to add data points to map
+        function addDataToMap(data) {
+            const markers = [];
+            const bounds = [];
+            
+            data.forEach(point => {
+                const lat = parseFloat(point.latitude);
+                const lng = parseFloat(point.longitude);
+                const rssi = parseFloat(point.rssi);
+                
+                if (!isNaN(lat) && !isNaN(lng) && !isNaN(rssi)) {
+                    bounds.push([lat, lng]);
+                    
+                    const marker = L.circleMarker([lat, lng], {
+                        radius: 6,
+                        fillColor: getRSSIColor(rssi),
+                        color: '#fff',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    });
+                    
+                    // Create popup content
+                    const popupContent = `
+                        <div style="font-family: Arial, sans-serif;">
+                            <h4 style="margin: 0 0 10px 0; color: ${getRSSIColor(rssi)};">
+                                Signal: ${getSignalQuality(rssi)}
+                            </h4>
+                            <p style="margin: 5px 0;"><strong>RSSI:</strong> ${rssi} dBm</p>
+                            <p style="margin: 5px 0;"><strong>Location:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
+                            ${point.timestamp ? `<p style="margin: 5px 0;"><strong>Time:</strong> ${point.timestamp}</p>` : ''}
+                            ${point.node_id ? `<p style="margin: 5px 0;"><strong>Node ID:</strong> ${point.node_id}</p>` : ''}
+                        </div>
+                    `;
+                    
+                    marker.bindPopup(popupContent);
+                    marker.addTo(map);
+                    markers.push(marker);
+                }
+            });
+            
+            // Fit map to show all points
+            if (bounds.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+            
+            return markers;
+        }
+        
+        // Load and process the CSV data
+        async function loadData() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/waterbearfieldschool/super-mini-mesh/refs/heads/main/firmware/supermini_sx1262/utilities/commandline/out.csv');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                const data = parseCSV(csvText);
+                
+                if (data.length === 0) {
+                    alert('No valid data points found in the CSV file.');
+                    return;
+                }
+                
+                console.log(`Loaded ${data.length} data points`);
+                console.log('Sample data point:', data[0]);
+                
+                // Add data to map and update statistics
+                addDataToMap(data);
+                updateStats(data);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data: ' + error.message);
+            }
+        }
+        
+        // Load the data when the page loads
+        loadData();
+    </script>
+</body>
+</html>
