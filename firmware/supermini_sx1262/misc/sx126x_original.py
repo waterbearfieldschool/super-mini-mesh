@@ -51,8 +51,6 @@ class SX126X:
           self.gpio = Pin(gpio, mode=Pin.IN)
 
         if implementation.name == 'circuitpython':
-          #do_not_use_this_spi = busio.SPI(clock=board.P0_24, MOSI=board.P1_00, MISO=board.P1_06)
-          do_not_use_this_spi = busio.SPI(clock=board.P0_06, MOSI=board.P0_08)
           self.spi = busio.SPI(board.P1_11, MOSI=board.P1_15, MISO=board.P0_02)
           while not self.spi.try_lock():
               pass
